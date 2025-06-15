@@ -1,83 +1,50 @@
-<!--Creacion de variables en PHP-->
 <?php
-    //true, 1, "Cadena"
-    //Lenguaje de tipado dinamico, debil y gradual
-    $name = "Zuriel";
-    $isDev = true;
-    $age = 20; 
+const API_URL = "https://whenisthenextmcufilm.com/api";
+#Inicializar una nueva sesion de cURL; ch = CURL Handle
+$ch = curl_init(API_URL);
+//Recibir peticion sin mostrar en pantalla
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+/*Ejecutar la peticion y almacenar la respuesta en una variable*/
+$result = curl_exec($ch);
 
-    /*    var_dump() es una funcion que imprime el tipo de dato y el valor de la variable
-    */
-    //var_dump($name, $isDev, $age);
-    //Retorna el tipo de dato de la variable
-    //echo gettype($name)
-    
-    //Declaracion de constantes globales
-    define("PI", 3.1416);
-    //Constantes locales
-    const NAME = "Zuriel";
+//Una alternativa seria utilizar la funcion file_get_contents
+// $result = file_get_contents(API_URL); //Si solo quieres hacer un GET de una API
 
-    //Condicionales
-    if ($age >= 18) {
-        echo "<h2> Eres mayor de edad </h2>";
-    } else {
-        echo "<h2> Eres menor de edad </h2>";
-    }
 
-    //Ternaria
-    $isOld = ($age >= 18) ? "Eres un adulto otra vez" : "No eres un adulto aun";
-    echo "<h2> $isOld </h2>";
+$data = json_decode($result, true);
 
-    //Match en php
-    $output = match (true) {
-        $age < 18               => "Eres un niño",
-        $age >= 18 && $age < 60 => "Eres un adulto",
-        $age >= 60              => "Eres un adulto mayor",
-        default                 => "Edad no válida"
-    };
-
-    //Arrays en php
-    $isArray = ["PHP", "JavaScript", "Python", "Mexicano", 1];
-    $isArray[3] = "C++";
-    $isArray[] = "Kotlin";
-
-    $person = [
-        "name" => "Zuriel",
-        "age" => 20,
-        "isDev" => true,
-        "languages" => ["PHP", "JavaScript", "Python"]
-    ];
-
-    $person["name"] = "Zuriel Hernandez";
-    $person["languages"][] = "C++";
+//Cerrar la sesion de cURL
+curl_close($ch);
 ?>
 
-<h3>
-    El mejor lenguaje de programacion es <?= $isArray[5] ?>
-</h3>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Próxima película del MCU</title>
+    <!-- Centered viewport -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.classless.min.css">>
+</head>
 
-<!-- Iteracion de un array -->
-<ul>
-    <?php foreach ($isArray as $key => $language): ?>
-        <li><?= $key . " " . $language ?></li>
-    <?php endforeach; ?>
-</ul>
+<main>
+    <!-- <pre style="font-size: 8px; color: red; overflow: scroll; height: 250px;">
+        <//?php var_dump($data); ?>
+    </pre> -->
 
-<!-- Forma alternativa de usar Condicionales -->
-<?php if ($age < 18): ?>
-    <h2> Eres un niño </h2>
-<?php elseif ($age >= 18): ?>
-    <h2> Eres un adulto </h2>
-<?php elseif( $age >= 60): ?>
-    <h2> Eres un adulto mayor </h2>
-<?php endif; ?>
+    <section>
+        <img 
+            src="<?= $data['poster_url'] ?>" width="300" alt="Imagen de la película <?= $data["title"]?>"
+            style="border-radius: 10px; box-shadow: 0 0 16px rgba(96, 5, 243, 0.5);"
+        >
+    </section>
 
-<h1>
-<!--?//php echo "Mi primera app en Php";?>-->
-    <?= "Mi nombre es " . NAME . " y tengo " . $age; ?>
-</h1>
-
-<a href="./miniProyecto.php">Ir al mini proyecto</a>
+    <hgroup>
+        <h3><?= $data["title"]; ?> Se estrena en <?= $data["days_until"]; ?></h3>
+        <p>Fecha de estreno: <?= $data["release_date"]; ?> </p>
+        <p>La siguiente es: <?= $data["following_production"]["title"];?> </p>
+    </hgroup>
+</main>
 
 <style>
     :root {
@@ -87,5 +54,22 @@
     body {
         display: grid;
         place-content: center;
+    }
+
+    section {
+        display: flex;
+        justify-content: center;
+        text-align: center;
+    }
+
+    hgroup {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+    }
+
+    img {
+        margin: 0 auto;
     }
 </style>
